@@ -13,7 +13,6 @@
   "dependencies": {
     "express": "^4.18.2",
     "puppeteer-core": "^20.2.0"
-    "puppeteer-heroku-buildpack": "^2.2.0"
   },
   "engines": {
     "node": "16.x"
