@@ -1,11 +1,15 @@
 const puppeteer = require('puppeteer');
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Use environment variable for port if available
 
 app.get('/scrape', async (req, res) => {
   // Use the new headless mode
-  const browser = await puppeteer.launch({ headless: 'new' });
+  const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // Use environment variable for Puppeteer executable path
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
   const page = await browser.newPage();
 
   // Use the barcode from the query parameter
