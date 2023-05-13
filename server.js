@@ -5,6 +5,7 @@ const port = process.env.PORT || 3000; // Use environment variable for port if a
 
 app.get('/scrape', async (req, res) => {
   // Use the new headless mode
+  process.env.PUPPETEER_CACHE_DIR = '/opt/render/project/.chrome';
   const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
 
