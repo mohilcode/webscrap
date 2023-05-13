@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const express = require('express');
+const puppeteer = require('puppeteer-heroku-buildpack');
 const app = express();
 const port = process.env.PORT || 3000; // Use environment variable for port if available
 
