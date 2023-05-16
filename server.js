@@ -23,16 +23,20 @@ app.get('/scrape', async (req, res) => {
   // Navigate to the product page
   await page.goto(productURL);
 
-  // Extract the product name and description
-  const [productName, productDescription] = await Promise.all([
-    page.$eval('.tit_prod .tit_txt', el => el.textContent),
-    page.$eval('#overview', el => el.textContent.trim())
-  ]);
+  // Extract the product name
+  const productName = await page.$eval('.tit_prod .tit_txt', el => el.textContent);
+
+  // Check if the #overview element exists and extract its content, default to "Description not available"
+  let productDescription = 'Description not available';
+  if (await page.$('#overview') !== null) {
+    productDescription = await page.$eval('#overview', el => el.textContent.trim());
+  }
 
   await browser.close();
 
   res.json({ productName, productDescription });
 });
+
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
