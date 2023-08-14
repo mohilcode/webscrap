@@ -3,6 +3,15 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
+const navigateWithTimeout = async (page, url, timeout) => {
+  return Promise.race([
+    page.goto(url),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Navigation timeout')), timeout)
+    )
+  ]);
+};
+
 app.get('/scrape', async (req, res) => {
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'], headless: "new" });
   const page = await browser.newPage();
@@ -13,7 +22,13 @@ app.get('/scrape', async (req, res) => {
     return;
   }
 
-  await page.goto(`https://www.tajimaya-cc.net/?s=${barcode}&search-type=products&submit=`);
+  try {
+    await navigateWithTimeout(page, `https://www.tajimaya-cc.net/?s=${barcode}&search-type=products&submit=`, 15000);
+  } catch (error) {
+    await browser.close();
+    res.status(500).send("Navigation timeout or an error occurred.");
+    return;
+  }
 
   const productURL = await page.$eval('ul.prod_list li a', el => el.href);
 
@@ -30,7 +45,6 @@ app.get('/scrape', async (req, res) => {
 
   res.json({ productName, productDescription });
 });
-
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
